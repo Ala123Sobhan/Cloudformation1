@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  MyApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: CloudApiGate1
+      ProtocolType: HTTP
+
+  DemoApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref MyApiGateway
+      StageName: live
+      Description: Live Stage
+      AutoDeploy: true
