@@ -1,4 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
 Resources:
   MyApiGateway:
     Type: AWS::ApiGatewayV2::Api
@@ -13,3 +15,30 @@ Resources:
       StageName: live
       Description: Live Stage
       AutoDeploy: true
+
+  MyServerLessLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: "nodejs18.x"
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (event) => {
+              console.log(JSON.stringify(event);
+              const response = {
+                  statusCode: 200,
+                  body: JSON.stringify('Hello from Lambda!'),
+              };
+              return response;
+          };
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: workloadbucket101
+
+Outputs:
+  BucketName:
+    Value: !Ref S3Bucket
+  BucketArn:
+    Value: !GetAtt S3Bucket.Arn
+#aws cloudformation create-stack --stack-name cloudformation102 --template-body file://apigateway-lambda-s3.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
