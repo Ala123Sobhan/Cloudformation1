@@ -7,7 +7,12 @@ Resources:
       Subscription: #endpoint to subscribe to the topic
         - Endpoint: "ala123sobhan@gmail.com"
           Protocol: "email"
-      TopicName: Topic101
+      TopicName: Topic102
 Outputs:
   FirstTopicArn:
     Value: !Ref FirstTopic
+#testing changeset cli
+#aws cloudformation create-change-set --stack-name arn:aws:cloudformation:us-west-2:199055471403:stack/snstopic/b5803990-00c9-11ee-aa92-02a3b5143cb3 --template-body file://snstopic.yaml --change-set-name firstsnschangeset
+
+#validate template
+#aws cloudformation validate-template --template-body file://template.yml
