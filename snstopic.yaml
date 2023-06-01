@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  FirstTopic:
+    Type: AWS::SNS::Topic #creates a sns topic where messages can be published & messages will be sent through sns to all applicable subscribers
+    Properties:
+      Subscription: #endpoint to subscribe to the topic
+        - Endpoint: "ala123sobhan@gmail.com"
+          Protocol: "email"
+      TopicName: Topic101
+Outputs:
+  FirstTopicArn:
+    Value: !Ref FirstTopic

@@ -16,8 +16,8 @@ Resources:
       Description: Live Stage
       AutoDeploy: true
 
-  MyServerLessLambdaFunction:
-    Type: AWS::Serverless::Function
+  MyServerLessLambdaFunction: #serverless function is used with aws SAM
+    Type: AWS::Serverless::Function #created a lambda function, IAM execution role (by default unlike cloudformation) & event src mappings that triggger the function
     Properties:
       Runtime: "nodejs18.x"
       Handler: index.handler

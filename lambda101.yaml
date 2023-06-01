@@ -3,7 +3,7 @@ Resources:
   LambdaRole:
     Type: "AWS::IAM::Role"
     Properties:
-      AssumeRolePolicyDocument:
+      AssumeRolePolicyDocument: #the trust policy that is associated with this role
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
@@ -13,7 +13,7 @@ Resources:
             Action:
               - "sts:AssumeRole"
       Path: /
-      Policies:
+      Policies: #adds a access policy to the role
         - PolicyName: root
           PolicyDocument:
             Version: "2012-10-17"
@@ -26,14 +26,14 @@ Resources:
     Properties:
       Path: /
       Roles:
-        - !Ref LambdaRole
-
-  MyLambdaFunction:
+        - !Ref LambdaRole #refer to the role
+    
+  MyLambdaFunction: #need deployment package (zip file) & execution role
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaRole.Arn
       Runtime: "nodejs18.x"
-      Handler: index.handler
+      Handler: index.handler  #the name of the method within the code that lambda calls
       Code:
         ZipFile: |
           exports.handler = async (event) => {
