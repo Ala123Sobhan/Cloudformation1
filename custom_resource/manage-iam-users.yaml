@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
-Description:
-  Create IAM Users.
+Description: Create IAM Users.
 
 # 1. IAM Uer Group
 # 2. IAM Users
@@ -11,19 +10,29 @@ Description:
 # 2. Reduce redundant or repetitive code
 
 Resources:
-
   RandomStringCustomResource:
     Type: "Custom::RandomString"
     Properties:
       length: 25
       ServiceToken: !ImportValue RandomizerLambdaArnB2301 # Importing value exported by another cloudformation template
+  RandomStringCustomResource2:
+    Type: "Custom::RandomString"
+    Properties:
+      length: 25
+      ServiceToken: !ImportValue RandomizerLambdaArnB2301
+
+  RandomStringCustomResource3:
+    Type: "Custom::RandomString"
+    Properties:
+      length: 25
+      ServiceToken: !ImportValue RandomizerLambdaArnB2301
 
   StudentsReadOnlyGroup:
     Type: AWS::IAM::Group
     Properties:
       GroupName: StudentsReadOnlyGroup
-#      Policies:
-#        - Policy
+  #      Policies:
+  #        - Policy
 
   StudentsReadOnlyPolicy:
     Type: AWS::IAM::Policy
@@ -31,11 +40,11 @@ Resources:
       Groups:
         - !Ref StudentsReadOnlyGroup
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
-            Action: '*'
-            Resource: '*'
+            Action: "*"
+            Resource: "*"
       PolicyName: StudentsReadOnlyPolicy
 
   StudentJohn:
@@ -54,7 +63,7 @@ Resources:
       Groups:
         - !Ref StudentsReadOnlyGroup
       LoginProfile:
-        Password: !GetAtt RandomStringCustomResource.RandomString
+        Password: !GetAtt RandomStringCustomResource2.RandomString
         PasswordResetRequired: true
       UserName: StudentDohn
 
@@ -64,7 +73,7 @@ Resources:
       Groups:
         - !Ref StudentsReadOnlyGroup
       LoginProfile:
-        Password: !GetAtt RandomStringCustomResource.RandomString
+        Password: !GetAtt RandomStringCustomResource3.RandomString
         PasswordResetRequired: true
       UserName: StudentMon
 
@@ -72,7 +81,10 @@ Outputs:
   RandomString:
     Description: RandomString Value
     Value: !GetAtt RandomStringCustomResource.RandomString
-
+  RandomString2:
+    Value: !GetAtt RandomStringCustomResource2.RandomString
+  RandomString3:
+    Value: !GetAtt RandomStringCustomResource3.RandomString
 # aws cloudformation create-stack --stack-name b2301-manage-iam-users --template-body file://manage-iam-users.yaml.yaml
 # aws cloudformation create-stack --stack-name b2301-manage-iam-users --template-body file://manage-iam-users.yaml --capabilities CAPABILITY_NAMED_IAM
 
