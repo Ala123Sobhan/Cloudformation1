@@ -1,0 +1,8 @@
+Resources:
+{% for bucket in buckets %}
+  {{ bucket }}:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: {{ bucket }}
+
+{% endfor %}

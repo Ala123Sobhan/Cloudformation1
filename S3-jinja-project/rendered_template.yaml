@@ -1,0 +1,19 @@
+Resources:
+
+  bucketjj1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: bucketjj1
+
+
+  bucketjj2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: bucketjj2
+
+
+  bucketjj3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: bucketjj3
+
