@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Simple S3 bucket for 199055471403
+Resources:
+  
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: jina-jinja-bucket101
+  
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: jina-jinja-bucket102
+  
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: jina-jinja-bucket103
+  
+
+
+
+
+  # sh create-cf.sh s3bucket-creation-dynamically.yaml buckets.json

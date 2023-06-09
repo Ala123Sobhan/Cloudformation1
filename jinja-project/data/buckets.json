@@ -1,0 +1,10 @@
+[
+    {
+     "bucket_names": [
+       {"value": "jinja-bucket101"},
+       {"value": "jinja-bucket102"},
+       {"value": "jinja-bucket103"}
+     ],
+     "aws_account_number": "199055471403"
+    }
+   ]
