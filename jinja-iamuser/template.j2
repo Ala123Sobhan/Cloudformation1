@@ -1,0 +1,49 @@
+Resources:
+{% for i in passwords %}
+  RandomStringCustomResource{{i}}:
+    Type: "Custom::RandomString"
+    Properties:
+      length: 25
+      ServiceToken: !ImportValue RandomizerLambdaArnB2301
+{% endfor %} 
+
+  StudentsReadOnlyGroup101:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: StudentsReadOnlyGroup101
+#      Policies:
+#        - Policy
+
+  StudentsReadOnlyPolicy101:
+    Type: AWS::IAM::Policy
+    Properties:
+      Groups:
+        - !Ref StudentsReadOnlyGroup101
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+      PolicyName: StudentsReadOnlyPolicy101
+
+
+{% for (iamuser,i) in zip(iamusers,passwords): %}
+  Student{{iamuser}}:
+    Type: AWS::IAM::User
+    Properties:
+      Groups:
+        - !Ref StudentsReadOnlyGroup101
+      LoginProfile:
+        Password: !GetAtt RandomStringCustomResource{{i}}.RandomString
+        PasswordResetRequired: true
+      UserName: Student{{iamuser}}
+{% endfor %}  
+
+
+Outputs:
+{% for i in passwords %}
+  RandomString{{i}}:
+    Description: RandomString Value
+    Value: !GetAtt RandomStringCustomResource{{i}}.RandomString
+{% endfor %}  

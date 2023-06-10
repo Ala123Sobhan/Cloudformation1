@@ -1,0 +1,89 @@
+Resources:
+
+  RandomStringCustomResource1:
+    Type: "Custom::RandomString"
+    Properties:
+      length: 25
+      ServiceToken: !ImportValue RandomizerLambdaArnB2301
+
+  RandomStringCustomResource2:
+    Type: "Custom::RandomString"
+    Properties:
+      length: 25
+      ServiceToken: !ImportValue RandomizerLambdaArnB2301
+
+  RandomStringCustomResource3:
+    Type: "Custom::RandomString"
+    Properties:
+      length: 25
+      ServiceToken: !ImportValue RandomizerLambdaArnB2301
+ 
+
+  StudentsReadOnlyGroup101:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: StudentsReadOnlyGroup101
+#      Policies:
+#        - Policy
+
+  StudentsReadOnlyPolicy101:
+    Type: AWS::IAM::Policy
+    Properties:
+      Groups:
+        - !Ref StudentsReadOnlyGroup101
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+      PolicyName: StudentsReadOnlyPolicy101
+
+
+
+  Studentalaina1:
+    Type: AWS::IAM::User
+    Properties:
+      Groups:
+        - !Ref StudentsReadOnlyGroup101
+      LoginProfile:
+        Password: !GetAtt RandomStringCustomResource1.RandomString
+        PasswordResetRequired: true
+      UserName: Studentalaina1
+
+  Studentalaina2:
+    Type: AWS::IAM::User
+    Properties:
+      Groups:
+        - !Ref StudentsReadOnlyGroup101
+      LoginProfile:
+        Password: !GetAtt RandomStringCustomResource2.RandomString
+        PasswordResetRequired: true
+      UserName: Studentalaina2
+
+  Studentalaina3:
+    Type: AWS::IAM::User
+    Properties:
+      Groups:
+        - !Ref StudentsReadOnlyGroup101
+      LoginProfile:
+        Password: !GetAtt RandomStringCustomResource3.RandomString
+        PasswordResetRequired: true
+      UserName: Studentalaina3
+  
+
+
+Outputs:
+
+  RandomString1:
+    Description: RandomString Value
+    Value: !GetAtt RandomStringCustomResource1.RandomString
+
+  RandomString2:
+    Description: RandomString Value
+    Value: !GetAtt RandomStringCustomResource2.RandomString
+
+  RandomString3:
+    Description: RandomString Value
+    Value: !GetAtt RandomStringCustomResource3.RandomString
+  
