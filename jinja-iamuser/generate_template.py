@@ -4,7 +4,6 @@ from jinja2 import Environment, FileSystemLoader
 # Define the data to be used in the template
 data = {
     'iamusers': ['alaina1', 'alaina2', 'alaina3'],
-    'passwords': [1,2,3]
 }
 
 # Load the Jinja2 environment

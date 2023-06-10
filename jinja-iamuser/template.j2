@@ -1,5 +1,5 @@
 Resources:
-{% for i in passwords %}
+{% for i in range(iamusers|length) %}
   RandomStringCustomResource{{i}}:
     Type: "Custom::RandomString"
     Properties:
@@ -28,8 +28,8 @@ Resources:
       PolicyName: StudentsReadOnlyPolicy101
 
 
-{% for (iamuser,i) in zip(iamusers,passwords): %}
-  Student{{iamuser}}:
+{% for i in range(0, iamusers|length): %}
+  Student{{iamusers[i]}}:
     Type: AWS::IAM::User
     Properties:
       Groups:
@@ -37,12 +37,12 @@ Resources:
       LoginProfile:
         Password: !GetAtt RandomStringCustomResource{{i}}.RandomString
         PasswordResetRequired: true
-      UserName: Student{{iamuser}}
+      UserName: Student{{iamusers[i]}}
 {% endfor %}  
 
 
 Outputs:
-{% for i in passwords %}
+{% for i in range(iamusers|length) %}
   RandomString{{i}}:
     Description: RandomString Value
     Value: !GetAtt RandomStringCustomResource{{i}}.RandomString

@@ -1,5 +1,11 @@
 Resources:
 
+  RandomStringCustomResource0:
+    Type: "Custom::RandomString"
+    Properties:
+      length: 25
+      ServiceToken: !ImportValue RandomizerLambdaArnB2301
+
   RandomStringCustomResource1:
     Type: "Custom::RandomString"
     Properties:
@@ -7,12 +13,6 @@ Resources:
       ServiceToken: !ImportValue RandomizerLambdaArnB2301
 
   RandomStringCustomResource2:
-    Type: "Custom::RandomString"
-    Properties:
-      length: 25
-      ServiceToken: !ImportValue RandomizerLambdaArnB2301
-
-  RandomStringCustomResource3:
     Type: "Custom::RandomString"
     Properties:
       length: 25
@@ -47,7 +47,7 @@ Resources:
       Groups:
         - !Ref StudentsReadOnlyGroup101
       LoginProfile:
-        Password: !GetAtt RandomStringCustomResource1.RandomString
+        Password: !GetAtt RandomStringCustomResource0.RandomString
         PasswordResetRequired: true
       UserName: Studentalaina1
 
@@ -57,7 +57,7 @@ Resources:
       Groups:
         - !Ref StudentsReadOnlyGroup101
       LoginProfile:
-        Password: !GetAtt RandomStringCustomResource2.RandomString
+        Password: !GetAtt RandomStringCustomResource1.RandomString
         PasswordResetRequired: true
       UserName: Studentalaina2
 
@@ -67,13 +67,17 @@ Resources:
       Groups:
         - !Ref StudentsReadOnlyGroup101
       LoginProfile:
-        Password: !GetAtt RandomStringCustomResource3.RandomString
+        Password: !GetAtt RandomStringCustomResource2.RandomString
         PasswordResetRequired: true
       UserName: Studentalaina3
   
 
 
 Outputs:
+
+  RandomString0:
+    Description: RandomString Value
+    Value: !GetAtt RandomStringCustomResource0.RandomString
 
   RandomString1:
     Description: RandomString Value
@@ -82,8 +86,4 @@ Outputs:
   RandomString2:
     Description: RandomString Value
     Value: !GetAtt RandomStringCustomResource2.RandomString
-
-  RandomString3:
-    Description: RandomString Value
-    Value: !GetAtt RandomStringCustomResource3.RandomString
   
