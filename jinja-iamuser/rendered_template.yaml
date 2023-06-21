@@ -19,6 +19,26 @@ Resources:
       ServiceToken: !ImportValue RandomizerLambdaArnB2301
  
 
+
+  ConsoleSignInLinkCustomResource0:
+    Type: "Custom::SignInLink"
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+      Arn: !GetAtt Studentalaina1.Arn
+
+  ConsoleSignInLinkCustomResource1:
+    Type: "Custom::SignInLink"
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+      Arn: !GetAtt Studentalaina2.Arn
+
+  ConsoleSignInLinkCustomResource2:
+    Type: "Custom::SignInLink"
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+      Arn: !GetAtt Studentalaina3.Arn
+ 
+
   StudentsReadOnlyGroup101:
     Type: AWS::IAM::Group
     Properties:
@@ -72,18 +92,68 @@ Resources:
       UserName: Studentalaina3
   
 
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaFunctionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: LambdaFunction
+      Handler: index.handler
+      Runtime: python3.8
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Code:
+        ZipFile: |
+          import re
+          import cfnresponse
+          def handler(event, context):
+              response_data = {}
+              try:
+                  arn = event["ResourceProperties"]["Arn"]
+                  account_id = arn.split(":")[4]
+                  sign_in_link = f"https://{account_id}.signin.aws.amazon.com/console/"
+                  response_data['SignInLink'] = sign_in_link
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data, "CustomResourcePhysicalID")
+              except Exception as e:
+                   error_message = str(e)
+                   print("Exception Error : " +error_message )
+                   cfnresponse.send(event, context, cfnresponse.FAILED, response_data, "CustomResourcePhysicalID")
+      Timeout: 60
 
 Outputs:
 
   RandomString0:
     Description: RandomString Value
     Value: !GetAtt RandomStringCustomResource0.RandomString
+  ConsoleSignInLinkCustomResource0:
+    Value: !GetAtt ConsoleSignInLinkCustomResource0.SignInLink
+    
+  
 
   RandomString1:
     Description: RandomString Value
     Value: !GetAtt RandomStringCustomResource1.RandomString
+  ConsoleSignInLinkCustomResource1:
+    Value: !GetAtt ConsoleSignInLinkCustomResource1.SignInLink
+    
+  
 
   RandomString2:
     Description: RandomString Value
     Value: !GetAtt RandomStringCustomResource2.RandomString
+  ConsoleSignInLinkCustomResource2:
+    Value: !GetAtt ConsoleSignInLinkCustomResource2.SignInLink
+    
+  
   

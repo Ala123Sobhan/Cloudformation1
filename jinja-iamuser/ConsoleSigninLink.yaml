@@ -1,52 +1,9 @@
 Resources:
-{% for i in range(iamusers|length) %}
-  RandomStringCustomResource{{i}}:
-    Type: "Custom::RandomString"
-    Properties:
-      length: 25
-      ServiceToken: !ImportValue RandomizerLambdaArnB2301
-{% endfor %} 
-
-{% for i in range(iamusers|length) %}
-  ConsoleSignInLinkCustomResource{{i}}:
+  GetLinks:
     Type: "Custom::SignInLink"
     Properties:
       ServiceToken: !GetAtt LambdaFunction.Arn
-      Arn: !GetAtt Student{{iamusers[i]}}.Arn
-{% endfor %} 
-
-  StudentsReadOnlyGroup101:
-    Type: AWS::IAM::Group
-    Properties:
-      GroupName: StudentsReadOnlyGroup101
-#      Policies:
-#        - Policy
-
-  StudentsReadOnlyPolicy101:
-    Type: AWS::IAM::Policy
-    Properties:
-      Groups:
-        - !Ref StudentsReadOnlyGroup101
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action: '*'
-            Resource: '*'
-      PolicyName: StudentsReadOnlyPolicy101
-
-
-{% for i in range(0, iamusers|length): %}
-  Student{{iamusers[i]}}:
-    Type: AWS::IAM::User
-    Properties:
-      Groups:
-        - !Ref StudentsReadOnlyGroup101
-      LoginProfile:
-        Password: !GetAtt RandomStringCustomResource{{i}}.RandomString
-        PasswordResetRequired: true
-      UserName: Student{{iamusers[i]}}
-{% endfor %}  
+      Arn: arn:aws:iam::199055471403:user/Studentalaina1
 
   LambdaFunctionRole:
     Type: AWS::IAM::Role
@@ -88,12 +45,9 @@ Resources:
       Timeout: 60
 
 Outputs:
-{% for i in range(iamusers|length) %}
-  RandomString{{i}}:
-    Description: RandomString Value
-    Value: !GetAtt RandomStringCustomResource{{i}}.RandomString
-  ConsoleSignInLinkCustomResource{{i}}:
-    Value: !GetAtt ConsoleSignInLinkCustomResource{{i}}.SignInLink
-    
-  
-{% endfor %}  
+  LambdaFunctionArn:
+    Value: !GetAtt LambdaFunction.Arn
+    Export:
+      Name: UserConsoleLinks
+  SignInLink:
+    Value: !GetAtt GetLinks.SignInLink
