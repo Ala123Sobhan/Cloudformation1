@@ -151,7 +151,7 @@ Resources:
                   cfnresponse.send(event, context, cfnresponse.FAILED, response_data)
 
 {% for i in range(iamusers|length) %}
-  EmailCustomResource:
+  EmailCustomResource{{i}}:
     Type: Custom::SendEmail
     Properties:
       ServiceToken: !GetAtt SendEmailFunction.Arn

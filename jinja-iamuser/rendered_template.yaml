@@ -195,7 +195,7 @@ Resources:
                   cfnresponse.send(event, context, cfnresponse.FAILED, response_data)
 
 
-  EmailCustomResource:
+  EmailCustomResource0:
     Type: Custom::SendEmail
     Properties:
       ServiceToken: !GetAtt SendEmailFunction.Arn
@@ -206,7 +206,7 @@ Resources:
         This is a test email from AWS SES.
       ConsoleLink: !GetAtt ConsoleSignInLinkCustomResource0.SignInLink
 
-  EmailCustomResource:
+  EmailCustomResource1:
     Type: Custom::SendEmail
     Properties:
       ServiceToken: !GetAtt SendEmailFunction.Arn
@@ -217,7 +217,7 @@ Resources:
         This is a test email from AWS SES.
       ConsoleLink: !GetAtt ConsoleSignInLinkCustomResource1.SignInLink
 
-  EmailCustomResource:
+  EmailCustomResource2:
     Type: Custom::SendEmail
     Properties:
       ServiceToken: !GetAtt SendEmailFunction.Arn
