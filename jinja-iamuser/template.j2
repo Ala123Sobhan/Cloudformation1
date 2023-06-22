@@ -86,6 +86,82 @@ Resources:
                    print("Exception Error : " +error_message )
                    cfnresponse.send(event, context, cfnresponse.FAILED, response_data, "CustomResourcePhysicalID")
       Timeout: 60
+  
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonSESFullAccess
+
+  SendEmailFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SendEmailFunction
+      Handler: index.lambda_handler
+      Runtime: python3.8
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+
+          def send_email(recipient_email, subject, body, link):
+              ses_client = boto3.client('ses', region_name='us-west-2')
+              response = ses_client.send_email(
+                  Source='ala123sobhan@gmail.com',
+                  Destination={
+                      'ToAddresses': [recipient_email]
+                  },
+                  Message={
+                      'Subject': {'Data': subject},
+                      'Body': {
+                          'Text': {
+                              'Data': f"{body}\n\nConsole Sign-in Link: {link}"
+                          }
+                      }
+                  }
+              )
+              return response
+
+          def lambda_handler(event, context):
+              response_data = {}
+              try:
+                  recipient_email = event['ResourceProperties']['RecipientEmail']
+                  subject = event['ResourceProperties']['Subject']
+                  body = event['ResourceProperties']['Body']
+                  link = event['ResourceProperties']['ConsoleLink']
+
+                  send_email(recipient_email, subject, body,link)
+
+                  response_data['Status'] = 'SUCCESS'
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data)
+              except Exception as e:
+                  response_data['Status'] = 'FAILED'
+                  response_data['Error'] = str(e)
+                  print("Exception Error : " +str(e))
+                  cfnresponse.send(event, context, cfnresponse.FAILED, response_data)
+
+{% for i in range(iamusers|length) %}
+  EmailCustomResource:
+    Type: Custom::SendEmail
+    Properties:
+      ServiceToken: !GetAtt SendEmailFunction.Arn
+      RecipientEmail: alasobhan.work+{{iamusers[i]}}@gmail.com
+      Subject: Hello from AWS SES
+      Body: |
+        Hello {{iamusers[i]}}, 
+        This is a test email from AWS SES.
+      ConsoleLink: !GetAtt ConsoleSignInLinkCustomResource{{i}}.SignInLink
+{% endfor %} 
 
 Outputs:
 {% for i in range(iamusers|length) %}

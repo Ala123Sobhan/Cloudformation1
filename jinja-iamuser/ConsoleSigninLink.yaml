@@ -1,14 +1,53 @@
 Resources:
-  GetLinks:
-    Type: "Custom::SignInLink"
-    Properties:
-      ServiceToken: !GetAtt LambdaFunction.Arn
-      Arn: arn:aws:iam::199055471403:user/Studentalaina1
+  # GetLinks:
+  #   Type: "Custom::SignInLink"
+  #   Properties:
+  #     ServiceToken: !GetAtt LambdaFunction.Arn
+  #     Arn: arn:aws:iam::199055471403:user/Studentalaina1
 
-  LambdaFunctionRole:
+  # LambdaFunctionRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: LambdaFunctionRole
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     ManagedPolicyArns:
+  #       - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  # LambdaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     FunctionName: LambdaFunction
+  #     Handler: index.handler
+  #     Runtime: python3.8
+  #     Role: !GetAtt LambdaFunctionRole.Arn
+  #     Code:
+  #       ZipFile: |
+  #         import re
+  #         import cfnresponse
+  #         def handler(event, context):
+  #             response_data = {}
+  #             try:
+  #                 arn = event["ResourceProperties"]["Arn"]
+  #                 account_id = arn.split(":")[4]
+  #                 sign_in_link = f"https://{account_id}.signin.aws.amazon.com/console/"
+  #                 response_data['SignInLink'] = sign_in_link
+  #                 cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data, "CustomResourcePhysicalID")
+  #             except Exception as e:
+  #                  error_message = str(e)
+  #                  print("Exception Error : " +error_message )
+  #                  cfnresponse.send(event, context, cfnresponse.FAILED, response_data, "CustomResourcePhysicalID")
+  #     Timeout: 60
+
+  LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: LambdaFunctionRole
+      RoleName: LambdaExecutionRole
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -18,36 +57,62 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonSESFullAccess
 
-  LambdaFunction:
+  SendEmailFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: LambdaFunction
-      Handler: index.handler
+      FunctionName: SendEmailFunction
+      Handler: index.lambda_handler
       Runtime: python3.8
-      Role: !GetAtt LambdaFunctionRole.Arn
+      Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ZipFile: |
-          import re
+          import boto3
           import cfnresponse
-          def handler(event, context):
+
+          def send_email(recipient_email, subject, body):
+              ses_client = boto3.client('ses', region_name='us-west-2')
+              response = ses_client.send_email(
+                  Source='ala123sobhan@gmail.com',
+                  Destination={
+                      'ToAddresses': [recipient_email]
+                  },
+                  Message={
+                      'Subject': {'Data': subject},
+                      'Body': {'Text': {'Data': body}}
+                  }
+              )
+              return response
+
+          def lambda_handler(event, context):
               response_data = {}
               try:
-                  arn = event["ResourceProperties"]["Arn"]
-                  account_id = arn.split(":")[4]
-                  sign_in_link = f"https://{account_id}.signin.aws.amazon.com/console/"
-                  response_data['SignInLink'] = sign_in_link
-                  cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data, "CustomResourcePhysicalID")
-              except Exception as e:
-                   error_message = str(e)
-                   print("Exception Error : " +error_message )
-                   cfnresponse.send(event, context, cfnresponse.FAILED, response_data, "CustomResourcePhysicalID")
-      Timeout: 60
+                  recipient_email = event['ResourceProperties']['RecipientEmail']
+                  subject = event['ResourceProperties']['Subject']
+                  body = event['ResourceProperties']['Body']
 
-Outputs:
-  LambdaFunctionArn:
-    Value: !GetAtt LambdaFunction.Arn
-    Export:
-      Name: UserConsoleLinks
-  SignInLink:
-    Value: !GetAtt GetLinks.SignInLink
+                  send_email(recipient_email, subject, body)
+
+                  response_data['Status'] = 'SUCCESS'
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data)
+              except Exception as e:
+                  response_data['Status'] = 'FAILED'
+                  response_data['Error'] = str(e)
+                  print("Exception Error : " +str(e))
+                  cfnresponse.send(event, context, cfnresponse.FAILED, response_data)
+
+  EmailCustomResource:
+    Type: Custom::SendEmail
+    Properties:
+      ServiceToken: !GetAtt SendEmailFunction.Arn
+      RecipientEmail: alasobhan.work@gmail.com
+      Subject: Hello from AWS SES
+      Body: This is a test email from AWS SES
+# Outputs:
+#   LambdaFunctionArn:
+#     Value: !GetAtt LambdaFunction.Arn
+#     Export:
+#       Name: UserConsoleLinks
+#   SignInLink:
+#     Value: !GetAtt GetLinks.SignInLink
